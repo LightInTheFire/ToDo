@@ -86,7 +86,11 @@ public class ToDoApplication {
                 }
                 case 3 -> {
                     System.out.println("Please enter new task priority(1 to 5):");
-                    task.setPriority(scanner.nextInt());
+                    try {
+                        task.setPriority(scanner.nextInt());
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
                 case 4 -> {
                     System.out.println("Please enter new task readiness(true or false):");
@@ -152,7 +156,7 @@ public class ToDoApplication {
         try {
             taskBuilder.setPriority(priority);
         } catch (IllegalArgumentException e) {
-            System.out.println("Priority should be an integer between 1 and 5");
+            System.out.println(e.getMessage());
             return;
         }
 
