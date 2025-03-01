@@ -1,8 +1,14 @@
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ToDoApplication {
     private final List<Task> tasks;
@@ -54,9 +60,35 @@ public class ToDoApplication {
     }
 
     private void loadState() {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("tasks.txt"))) {
+            Pattern pattern = Pattern.compile("Task\\{.*name=['\"](.*?)['\"].*description=['\"](.*?)['\"].*priority=(\\d+).*done=(true|false).*\\}");
+            while (bufferedReader.ready()) {
+                String line = bufferedReader.readLine();
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find()) {
+                    String name = matcher.group(1);
+                    String description = matcher.group(2);
+                    int priority = Integer.parseInt(matcher.group(3));
+                    boolean done = Boolean.parseBoolean(matcher.group(4));
+                    Task task = new Task(name, description, priority, done);
+                    tasks.add(task);
+                }
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error while loading tasks.txt");
+        }
     }
 
     private void saveState() {
+        try (FileWriter fileWriter = new FileWriter("tasks.txt"))  {
+            for (Task task : tasks) {
+                fileWriter.write(task.toString());
+                fileWriter.write("\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Error while saving tasks.txt");
+        }
     }
 
     private void updateTask() {
